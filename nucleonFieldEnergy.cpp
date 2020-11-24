@@ -19,9 +19,9 @@
 //PROTON_RADII_IN_SIM defines how far apart the edges of the simulated area are.  The orbitspheres are centered in the middle.
 //num_points_grid_line says how many grid cubes tall the proton is (diameter)
 //num_points_circle says how many points of charge are equally spaced around each circle on the orbitsphere surface
-#define PROTON_RADII_IN_SIM 10
-#define num_points_grid_line 64
-#define num_points_circle 64
+#define PROTON_RADII_IN_SIM 5
+#define num_points_grid_line 16
+#define num_points_circle 16
 //
 int num_points_sphere = 2 * (num_points_circle / 2 - 1) * (num_points_circle / 2);
 double grid_step = 2 * PROTON_RADIUS / (double)num_points_grid_line;
@@ -892,6 +892,7 @@ void computeBFieldVectorAtPointProton(orbitsphere* o1, double x1, double y1, dou
 	vector fieldAtPointXyz;
 	vector resultantFieldXyz;
 	vector loopCenter;
+	vector loopCenterToFieldPoint;
 	int pointIndexOne = 0;
 	int pointIndexTwo = 0;
 	double loopCharge = 0.0;
@@ -941,6 +942,9 @@ void computeBFieldVectorAtPointProton(orbitsphere* o1, double x1, double y1, dou
 		{//[ ] TODO tighten up this condition
 			return;//result is 0 so far
 		}
+		loopCenterToFieldPoint.magnitude_x = x1 - loopCenter.magnitude_x;
+		loopCenterToFieldPoint.magnitude_y = y1 - loopCenter.magnitude_y;
+		double radius_angle = atan(loopCenterToFieldPoint.magnitude_x/ loopCenterToFieldPoint.magnitude_y);
 		double alpha = r / a;
 		double beta = axialOffset / a;
 		double gamma = axialOffset / r;
@@ -956,8 +960,8 @@ void computeBFieldVectorAtPointProton(orbitsphere* o1, double x1, double y1, dou
 		double Hr = (r == 0.0) ? (0.0) : (Ht * gamma * (ek * (1 + al2 + be2) / (q - (alpha * 4)) - fk));
 		fieldAtPointBxAxial = Hx * MU_0;//convert from H to B field
 		fieldAtPointBrRadial = Hr * MU_0;
-		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(fieldAtPointBrRadial);//[ ] TODO check on sin, cos
-		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(fieldAtPointBrRadial);//make sure not backwards
+		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(radius_angle);//[ ] TODO check on sin, cos
+		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(radius_angle);//make sure not backwards
 		fieldAtPointXyz.magnitude_z = fieldAtPointBxAxial;
 		resultantFieldXyz.magnitude_x = resultantFieldXyz.magnitude_x + fieldAtPointXyz.magnitude_x;
 		resultantFieldXyz.magnitude_y = resultantFieldXyz.magnitude_y + fieldAtPointXyz.magnitude_y;
@@ -976,6 +980,7 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 	vector fieldAtPointXyz;
 	vector resultantFieldXyz;
 	vector loopCenter;
+	vector loopCenterToFieldPoint;
 	int pointIndexOne = 0;
 	int pointIndexTwo = 0;
 	double loopCharge = 0.0;
@@ -1025,6 +1030,9 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		{//[ ] TODO tighten up this condition
 			return;//result is 0 so far
 		}
+		loopCenterToFieldPoint.magnitude_x = x1 - loopCenter.magnitude_x;
+		loopCenterToFieldPoint.magnitude_y = y1 - loopCenter.magnitude_y;
+		double radius_angle = atan(loopCenterToFieldPoint.magnitude_x / loopCenterToFieldPoint.magnitude_y);
 		double alpha = r / a;
 		double beta = axialOffset / a;
 		double gamma = axialOffset / r;
@@ -1040,8 +1048,8 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		double Hr = (r == 0.0) ? (0.0) : (Ht * gamma * (ek * (1 + al2 + be2) / (q - (alpha * 4)) - fk));
 		fieldAtPointBxAxial = Hx * MU_0;//convert from H to B field
 		fieldAtPointBrRadial = Hr * MU_0;
-		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(fieldAtPointBrRadial);//[ ] TODO check on sin, cos
-		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(fieldAtPointBrRadial);//make sure not backwards
+		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(radius_angle);//[ ] TODO check on sin, cos
+		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(radius_angle);//make sure not backwards
 		fieldAtPointXyz.magnitude_z = fieldAtPointBxAxial;
 		resultantFieldXyz.magnitude_x = resultantFieldXyz.magnitude_x + fieldAtPointXyz.magnitude_x;
 		resultantFieldXyz.magnitude_y = resultantFieldXyz.magnitude_y + fieldAtPointXyz.magnitude_y;
@@ -1076,6 +1084,9 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		double temp3 = loopCenter.magnitude_z - o2->points_z[pointIndexOne];
 		temp3 = temp3 * temp3;
 		temp = temp + temp2 + temp3;
+		loopCenterToFieldPoint.magnitude_x = x1 - loopCenter.magnitude_x;
+		loopCenterToFieldPoint.magnitude_y = y1 - loopCenter.magnitude_y;
+		double radius_angle = atan(loopCenterToFieldPoint.magnitude_x / loopCenterToFieldPoint.magnitude_y);
 		float a = (float)sqrt(temp);
 		double axialOffset = o2->points_z[pointIndexOne];//z coord of the present loop[ ] TODO add axial offset back in?
 		axialOffset = axialOffset - z1;//[ ] TODO check sign! field computed is relative to axialOffset
@@ -1095,8 +1106,8 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		double Hr = (r == 0.0) ? (0.0) : (Ht * gamma * (ek * (1 + al2 + be2) / (q - (alpha * 4)) - fk));
 		fieldAtPointBxAxial = Hx * MU_0;//convert from H to B field
 		fieldAtPointBrRadial = Hr * MU_0;
-		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(fieldAtPointBrRadial);//[ ] TODO check on sin, cos
-		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(fieldAtPointBrRadial);//make sure not backwards
+		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(radius_angle);//[ ] TODO check on sin, cos
+		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(radius_angle);//make sure not backwards
 		fieldAtPointXyz.magnitude_z = fieldAtPointBxAxial;
 		resultantFieldXyz.magnitude_x = resultantFieldXyz.magnitude_x + fieldAtPointXyz.magnitude_x;
 		resultantFieldXyz.magnitude_y = resultantFieldXyz.magnitude_y + fieldAtPointXyz.magnitude_y;
@@ -1132,6 +1143,9 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		double temp3 = loopCenter.magnitude_z - o3->points_z[pointIndexOne];
 		temp3 = temp3 * temp3;
 		temp = temp + temp2 + temp3;
+		loopCenterToFieldPoint.magnitude_x = x1 - loopCenter.magnitude_x;
+		loopCenterToFieldPoint.magnitude_y = y1 - loopCenter.magnitude_y;
+		double radius_angle = atan(loopCenterToFieldPoint.magnitude_x / loopCenterToFieldPoint.magnitude_y);
 		float a = (float)sqrt(temp);
 		double axialOffset = o3->points_z[pointIndexOne];//z coord of the present loop[ ] TODO add axial offset back in?
 		axialOffset = axialOffset - z1;//[ ] TODO check sign! field computed is relative to axialOffset
@@ -1151,8 +1165,8 @@ void computeBFieldVectorAtPointNeutron(orbitsphere* o1, orbitsphere* o2, orbitsp
 		double Hr = (r == 0.0) ? (0.0) : (Ht * gamma * (ek * (1 + al2 + be2) / (q - (alpha * 4)) - fk));
 		fieldAtPointBxAxial = Hx * MU_0;//convert from H to B field
 		fieldAtPointBrRadial = Hr * MU_0;
-		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(fieldAtPointBrRadial);//[ ] TODO check on sin, cos
-		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(fieldAtPointBrRadial);//make sure not backwards
+		fieldAtPointXyz.magnitude_x = fieldAtPointBrRadial * sin(radius_angle);//[ ] TODO check on sin, cos
+		fieldAtPointXyz.magnitude_y = fieldAtPointBrRadial * cos(radius_angle);//make sure not backwards
 		fieldAtPointXyz.magnitude_z = fieldAtPointBxAxial;
 		resultantFieldXyz.magnitude_x = resultantFieldXyz.magnitude_x + fieldAtPointXyz.magnitude_x;
 		resultantFieldXyz.magnitude_y = resultantFieldXyz.magnitude_y + fieldAtPointXyz.magnitude_y;
