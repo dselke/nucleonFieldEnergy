@@ -1,7 +1,7 @@
-/* nucleonFieldEnergy.cpp : win32 console application written in Visual Studio 2019. *//* David L. Selke 2014 */
+/* nucleonFieldEnergy.cpp : win32 console application written in Visual Studio 2019. *//* David L. Selke */
 /* the program ELLIPTIC.C by E. Dennison has been included with original comments below.*/
 /* it is used for magnetic field computations, specifically the complete elliptic integrals of 1st and 2nd kind */
-
+/* the ELLIPTIC.C code is linked at https://tiggerntatie.github.io/emagnet/offaxis/iloopoffaxis.htm */
 #include<math.h>
 #include<stdio.h>
 #include<stdlib.h>
